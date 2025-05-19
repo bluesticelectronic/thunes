@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #edf3fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #e6f0fa;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .header {
+      background-color: #5a3fc0;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #5a3fc0;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background-color: #472f9c;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    #paymentSection {
+      display: none;
+      padding: 20px;
+      max-width: 600px;
+      text-align: center;
+      background-color: #e6f0fa;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    #uploadContainer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #uploadContent {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>THUNES INVESTMENT</h1>
+
+<!-- Registration Form -->
+<div class="container" id="registrationContainer">
+  <form id="registerForm">
+    <div class="header">REGISTER ACCOUNT</div>
+    <input type="text" name="fullname" placeholder="Full Name" required />
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="email" name="email" placeholder="Email Address" required />
+    <input type="tel" name="phone" placeholder="Phone Number" required />
+
+    <select name="country" required>
+      <option value="" disabled selected>Select Country</option>
+      <option value="United States">United States</option>
+      <option value="United Kingdom">United Kingdom</option>
+      <option value="Canada">Canada</option>
+      <option value="Australia">Australia</option>
+      <option value="Nigeria">Nigeria</option>
+      <option value="India">India</option>
+    </select>
+
+    <input type="password" name="password" placeholder="Create Password" required />
+
+    <div style="width: 100%; text-align: left; margin-top: 10px;">
+      <input type="checkbox" name="terms" id="terms" required style="transform: scale(1.2);" />
+      <label for="terms">I agree to the terms and conditions</label>
+    </div>
+
+    <button id="submit" type="button">GO TO PAYMENT</button>
+
+    <p style="margin-top: 15px; font-size: 14px;">
+      Already have an account?
+      <a href="login.html" style="color: #5a3fc0; text-decoration: none; font-weight: bold;">Sign in</a>
+    </p>
+  </form>
+</div>
+
+<!-- Payment Section -->
+<div id="paymentSection">
+  <div style="background-color:#4c36d2;color:white;padding:20px;font-size:24px;font-weight:bold;">MANUAL DEPOSIT</div>
+  <div style="border:1px solid #4c36d2; border-radius:10px; padding:20px; background:#e6f0ff; margin-top:20px;">
+    <h3 style="text-align:center; color:#1966cc;">PAY WITH MTN RWANDA</h3>
+    <p><b>OPTION 1</b><br/>*182*1*3*1*254708663351#<br/>NAME IS (REBECCA OLANG)<br/>Amount 3700 RWF</p>
+    <p><b>OPTION 2</b><br/>*182*1*3*1*255747500685#<br/>NAME IS (ISINGIZWE ARIANE )<br/>Amount 3700 RWF</p>
+    <p style="color:#1966cc;"><b>N.B:</b> BIRABUJIJWE KUGIRA INDI NUMBER WISHYURAHO ITARIMUZA TANZWE HARUGURU</p>
+    <p style="color:red; font-weight:bold;">
+      Sending funds on wrong number will end up lose! 
+      <a href="support.html" style="color:#4c36d2; text-decoration:underline;">Click here for Support</a>
+    </p>
+  </div>
+  <button onclick="showUploadSection()" style="margin-top:20px; background-color:#4c36d2; color:white; padding:15px 30px; border:none; border-radius:20px; font-size:16px; cursor:pointer;">
+    Submit Payment Request
+  </button>
+</div>
+
+<!-- Upload & Activation Modal -->
+<div id="uploadContainer">
+  <div id="uploadContent"></div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEugPCWlQb3WoOk_PPmdr439sFY0gWPGU",
+    authDomain: "thunes-investment.firebaseapp.com",
+    projectId: "thunes-investment",
+    storageBucket: "thunes-investment.firebasestorage.app",
+    messagingSenderId: "263770381335",
+    appId: "1:263770381335:web:7f01cd3adb127c9d9ad052"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const submitBtn = document.getElementById("submit");
+  const form = document.getElementById("registerForm");
+  const paymentSection = document.getElementById("paymentSection");
+
+  submitBtn.addEventListener("click", function () {
+    const fullname = form.fullname.value.trim();
+    const username = form.username.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+    const country = form.country.value;
+    const password = form.password.value;
+    const termsChecked = form.terms.checked;
+
+    if (!fullname || !username || !email || !phone || !country || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (!termsChecked) {
+      alert("You must agree to the terms and conditions.");
+      return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        document.getElementById("registrationContainer").style.display = "none";
+        paymentSection.style.display = "block";
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  });
+
+  function showUploadSection() {
+    const container = document.getElementById("uploadContainer");
+    const content = document.getElementById("uploadContent");
+
+    container.style.display = "flex";
+    content.innerHTML = `
+      <h2 style="color:#4c36d2;">Upload Payment Screenshot</h2>
+      <input type="file" id="screenshotUpload" accept="image/*" style="margin:20px 0;" />
+      <button onclick="showActivationFromUpload()" style="background-color:#4c36d2; color:white; padding:10px 20px; border:none; border-radius:5px;">Submit Screenshot</button>
+      <br /><br />
+      <button onclick="closeUploadSection()" style="background-color:#ccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cancel</button>
+    `;
+  }
+
+  function showActivationFromUpload() {
+    const content = document.getElementById("uploadContent");
+
+    content.innerHTML = `
+      <h2 style="color:#4c36d2;">Enter Activation Code</h2>
+      <input type="text" id="activationCode" placeholder="Activation Code" style="margin: 10px 0; padding: 10px; width: 100%; border-radius: 5px;" />
+      <button onclick="submitActivationCode()" style="background-color:#4c36d2; color:white; padding:10px 20px; border:none; border-radius:5px;">Submit Activation Code</button>
+      <br /><br />
+      <button onclick="closeUploadSection()" style="background-color:#ccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cancel</button>
+    `;
+  }
+
+  function submitActivationCode() {
+    const code = document.getElementById("activationCode").value.trim();
+    if (!code) {
+      alert("Please enter the activation code.");
+      return;
+    }
+
+    if (code === "248135") {
+      alert("Activation successful! Redirecting...");
+      window.location.href = " https://bluesticelectronic.github.io/registeri/";
+    } else {
+      alert("Invalid activation code. Please try again.");
+    }
+  }
+
+  function closeUploadSection() {
+    document.getElementById("uploadContainer").style.display = "none";
+  }
+</script>
+
+</body>
+</html>
